@@ -1,0 +1,269 @@
+/* =============================================================================
+ * base.css - colours, layout, slide transitions and text components
+ * Other style files: illustration.css (umbrella drawings), effects.css (backgrounds)
+ * ========================================================================== */
+
+/* Design tokens: change the colours here */
+:root {
+  --bg: #000;
+  --ink: #f2f4f7;
+  --mut: #aab0bb;
+  --blue: #4da3ff;
+  --card: rgba(225, 229, 236, 0.92);
+  --cardink: #12151b;
+  --purple: #a855f7;
+  box-sizing: border-box;
+}
+* {
+  box-sizing: inherit;
+  margin: 0;
+}
+html,
+body {
+  touch-action: pan-y;
+  cursor: pointer;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, system-ui, sans-serif;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+h1,
+h2,
+h3 {
+  font-family: "Chakra Petch", Inter, sans-serif;
+}/* ---- Slides: each slide fills the screen; only .on is visible. .out / --dir drive the slide animation ---- */
+
+.s {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(18px, 4vw, 56px) clamp(18px, 6vw, 90px) clamp(46px, 7vh, 70px);
+  overflow-y: auto;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(calc(var(--dir, 1) * 60px)) scale(0.98);
+  filter: blur(8px);
+  transition:
+    opacity 0.6s,
+    transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 0.6s,
+    visibility 0s 0.7s;
+}
+.s.on {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  filter: none;
+  transition-delay: 0s;
+}
+.s.out {
+  transform: translateX(calc(var(--dir, 1) * -60px)) scale(0.98);
+}
+.s > * {
+  max-width: 1200px;
+  width: 100%;
+  margin-inline: auto;
+}
+.s.on .rv {
+  animation: rv 0.7s both cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.s.on .rv:nth-child(2) {
+  animation-delay: 0.12s;
+}
+.s.on .rv:nth-child(3) {
+  animation-delay: 0.22s;
+}
+.s.on .rv:nth-child(4) {
+  animation-delay: 0.32s;
+}
+.s.on .rv:nth-child(5) {
+  animation-delay: 0.42s;
+}
+@keyframes rv {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+h2 {
+  font-size: clamp(24px, 4.6vw, 52px);
+  letter-spacing: 0.04em;
+  margin-bottom: clamp(14px, 3vh, 30px);
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  justify-content: space-between;
+}
+h2 i {
+  font-style: normal;
+  font-size: 0.9em;
+  filter: drop-shadow(0 0 14px currentColor);
+}/* ---- Text components: titles, cards, big paragraphs ---- */
+
+.sub {
+  color: var(--mut);
+  margin-top: -0.4em;
+  margin-bottom: 1em;
+  font-size: clamp(14px, 1.8vw, 20px);
+}
+.grid {
+  display: grid;
+  gap: clamp(10px, 1.6vw, 20px);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+}
+.card {
+  background: var(--card);
+  color: var(--cardink);
+  border-radius: 18px;
+  padding: clamp(14px, 2vw, 26px);
+  backdrop-filter: blur(6px);
+}
+.card .ic {
+  font-size: clamp(26px, 3.4vw, 40px);
+  display: block;
+  margin-bottom: 0.3em;
+}
+.card h3 {
+  font-size: clamp(17px, 2vw, 24px);
+  margin-bottom: 0.3em;
+}
+.card p {
+  font-size: clamp(13px, 1.5vw, 18px);
+  line-height: 1.45;
+  color: #2b303a;
+}
+.dark {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--ink);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.dark p {
+  color: #d4d8e0;
+}
+.dark h3 {
+  color: var(--blue);
+}/* ---- Author tag (bottom-left) ---- */
+
+.who {
+  position: fixed;
+  left: clamp(18px, 6vw, 90px);
+  bottom: clamp(14px, 3vh, 28px);
+  z-index: 3;
+  font-size: clamp(11px, 1.3vw, 15px);
+  color: var(--mut);
+  letter-spacing: 0.06em;
+  opacity: 0;
+  transition: opacity 0.5s;
+}/* ---- Cover slide ---- */
+
+.cover {
+  text-align: left;
+}
+.cover img {
+  width: min(300px, 60vw);
+  display: block;
+  margin-bottom: 6vh;
+}
+.cover h1 {
+  font-size: clamp(40px, 10vw, 120px);
+  line-height: 0.95;
+  letter-spacing: 0.03em;
+  background: linear-gradient(100deg, #fff, #9aa3b2 50%, #fff);
+  background-size: 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sh 6s linear infinite;
+}
+@keyframes sh {
+  to {
+    background-position: 200% 0;
+  }
+}
+.cover p {
+  margin-top: 2.5vh;
+  color: var(--mut);
+  font-size: clamp(13px, 1.7vw, 20px);
+  line-height: 1.7;
+}/* ---- Two-column layout (illustration + cards); one column on phones ---- */
+
+.two {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(14px, 3vw, 40px);
+  align-items: center;
+}
+.two .grid {
+  grid-template-columns: 1fr;
+}
+@media (max-width: 760px) {
+  .two {
+    grid-template-columns: 1fr;
+  }
+  .um {
+    max-height: 30vh;
+    margin: auto;
+  }
+}/* ---- Value proposition paragraphs ---- */
+
+.big {
+  font-size: clamp(16px, 2.3vw, 28px);
+  line-height: 1.5;
+  display: grid;
+  gap: 1.1em;
+}
+.big p {
+  border-left: 3px solid var(--blue);
+  padding-left: 1em;
+}/* ---- Progress bar, slide counter and first-visit hint ---- */
+
+.pr {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--blue), #fff);
+  z-index: 5;
+  transition: width 0.5s;
+}
+.ct {
+  position: fixed;
+  right: clamp(14px, 3vw, 36px);
+  bottom: clamp(14px, 3vh, 28px);
+  z-index: 5;
+  font-size: 13px;
+  color: var(--mut);
+  font-family: "Chakra Petch", sans-serif;
+}
+.hint {
+  position: fixed;
+  inset: auto 0 8vh;
+  text-align: center;
+  z-index: 6;
+  color: #fff;
+  font-size: 14px;
+  pointer-events: none;
+  animation: hd 5s forwards;
+}
+@keyframes hd {
+  70% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+/* Respect the "reduce motion" accessibility setting */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition-duration: 0.01s !important;
+  }
+}
