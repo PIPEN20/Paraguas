@@ -4,8 +4,8 @@
  * umbrellaSVG(mode) returns an <svg> string. Each slide asks for a different
  * "mode" so the drawing matches the topic of the slide:
  *   ""        open umbrella with water flowing to the centre   (slide 4)
+ *   "tank"    same umbrella + labelled handle cut-away         (slide 6)
  *   "closed"  umbrella closed with the reverse mechanism       (slide 5)
- *   "tank"    handle cut-away with labelled parts              (slide 6)
  *   "bt"      phone + umbrella + battery module / USB-C        (slide 7)
  *   "haptic"  vibrating handle + "Find My" location pin        (slide 8)
  *
@@ -36,11 +36,20 @@ for (let i = 0; i < 8; i++) {
   CANOPY_OUTLINE += `Q${m} ${w}`;
 }
 CANOPY_OUTLINE += "Z";
-/** Text label + leader line + dot pointing at a part of the drawing (slide 6). */
-const calloutSVG = (x, y, t, an, lx, ly) =>
-  `<path d="M${x} ${y}L${lx} ${ly}" stroke="#cfe3ff" stroke-width="1.2"/>
-      <circle cx="${lx}" cy="${ly}" r="3" fill="#4da3ff"/>
-      <text x="${x}" y="${y + 5}" font-size="16" fill="#cfe3ff" text-anchor="${an}" font-family="Inter,sans-serif">${t}</text>`;
+/** Two-line label (bold title + small detail) whose left edge starts where a leader line of the cut-away image ends. */
+const partLabelSVG = (x, y, title, sub) =>
+  `<text x="${x}" y="${y - 1}" font-size="20" font-weight="700" fill="#fff" font-family="Inter,sans-serif">${title}</text>
+      <text x="${x}" y="${y + 19}" font-size="15.5" fill="#cfe3ff" font-family="Inter,sans-serif">${sub}</text>`;
+/**
+ * Handle cut-away at the bottom-left of slide 6: images/canalizacion de agua.png (345x281, with the leader lines
+ * already drawn) shown at 0.8 scale, plus the four text labels placed at the end of each line.
+ */
+const handleCutawaySVG = () =>
+  `<image href="images/canalizacion%20de%20agua.png" x="-150" y="235" width="276" height="225"/>` +
+  partLabelSVG(-26, 254, "Tubo central hueco", "para almacenar el agua") +
+  partLabelSVG(-26, 306, "Válvula unidireccional", "de silicona") +
+  partLabelSVG(-26, 356, "Depósito de agua", "en el mango") +
+  partLabelSVG(26, 418, "Rosca inferior", "para vaciar el agua acumulada");
 /** Glass window with animated water level and a falling drop (inside the handle). `id` must be unique. */
 const waterWindowSVG = (x, y, w, h, r, t) =>
   `<clipPath id="k${t}">
@@ -157,54 +166,21 @@ const umbrellaSVG = (m = "") => {
       <path d="M304 262H316L313 274H307Z" fill="url(#gM)"/>`;
     return wrapSVG("0 0 620 460", o);
   }
-  // Slide 6: handle cut-away (funnel -> hollow tube -> silicone valve -> water reservoir -> thread).
-  if (m == "tank") {
-    o = `<path d="M130 80Q310 -20 490 80L462 88Q310 20 158 88Z" fill="url(#gB)" stroke="#0b1020" stroke-width="2"/>
-      <path class="fl2" d="M190 62L284 96M430 62L336 96"/>
-      <path class="fl" d="M190 62L284 96M430 62L336 96"/>
-      <path d="M246 70H374L340 120H280Z" fill="url(#gM)" stroke="#2a2e36" stroke-width="2"/>
-      <ellipse cx="310" cy="70" rx="64" ry="10" fill="#06142c" stroke="#aab0bb" stroke-width="2"/>
-      <ellipse class="pl" cx="310" cy="70" rx="40" ry="5" fill="#52b9ff"/>`;
-    o += `<rect x="288" y="120" width="44" height="140" fill="url(#gM)" stroke="#2a2e36"/>
-      <rect x="298" y="120" width="24" height="140" fill="#04122a"/>
-      <path class="fl2" d="M310 126V250"/>
-      <path class="fl" d="M310 126V250"/>
-      <rect x="282" y="256" width="56" height="36" rx="10" fill="#5aa0ff" opacity=".8" stroke="#cfe3ff" stroke-width="2"/>
-      <path d="M290 266Q310 284 330 266" stroke="#0a2a66" stroke-width="3" fill="none"/>`;
-    o +=
-      `<path d="M236 304Q236 292 250 292H370Q384 292 384 304L392 430Q392 452 368 452H252Q228 452 228 430Z" fill="url(#gG)" stroke="#3a3e48" stroke-width="2"/>` +
-      waterWindowSVG(262, 316, 96, 100, 14, "ct") +
-      `<rect x="246" y="424" width="128" height="26" rx="8" fill="#0d0e11" stroke="#5a606c" stroke-width="1.5"/>
-      <path d="M256 424l12 26M276 424l12 26M296 424l12 26M316 424l12 26M336 424l12 26M356 424l12 26" stroke="#6b7280" stroke-width="2"/>`;
-    o +=
-      calloutSVG(276, 185, "Tubo central hueco", "end", 288, 185) +
-      calloutSVG(274, 274, "Válvula unidireccional de silicona", "end", 282, 274) +
-      calloutSVG(396, 366, "Depósito de agua en el mango", "start", 358, 366) +
-      calloutSVG(396, 440, "Rosca inferior", "start", 374, 440);
-    return wrapSVG("0 0 640 460", o);
-  }
+  // Slide 6: the same open umbrella as slide 4 plus the labelled handle cut-away.
+  if (m == "tank") return wrapSVG("-150 0 770 470", canopySVG() + handleSVG("tank") + handleCutawaySVG());
   if (m == "bt") {
-    o = `<g transform="translate(168 60) scale(.7)">${canopySVG() + handleSVG("bt")}</g>
-      <rect x="20" y="70" width="150" height="300" rx="26" fill="#0b0c10" stroke="#6b7280" stroke-width="3"/>
-      <rect x="30" y="86" width="130" height="268" rx="16" fill="#0a1a3a"/>
-      <text x="95" y="122" font-size="15" fill="#fff" text-anchor="middle" font-family="Chakra Petch,sans-serif">SmartUmbrella</text>
-      <circle cx="78" cy="190" r="14" fill="#fff"/>
-      <circle cx="98" cy="180" r="19" fill="#fff"/>
-      <circle cx="118" cy="190" r="14" fill="#fff"/>
-      <rect x="78" y="190" width="40" height="14" fill="#fff"/>
-      <text x="95" y="256" font-size="34" fill="#fff" text-anchor="middle" font-family="Chakra Petch,sans-serif">22°C</text>
-      <text x="95" y="290" font-size="14" fill="#cfe3ff" text-anchor="middle" font-family="Inter,sans-serif">Lluvia 70%</text>
-      <rect x="50" y="312" width="90" height="22" rx="11" fill="#2468cc"/>`;
-    o += `<path class="fl2" d="M176 240Q270 170 372 290"/>
-      <path class="fl" d="M176 240Q270 170 372 290"/>`;
+    o = `<g transform="translate(205 62) scale(.66)">${canopySVG() + handleSVG("bt")}</g>
+      <image href="images/app.png" x="-58" y="40" width="310" height="388"/>`;
+    o += `<path class="fl2" d="M204 250Q300 170 398 285"/>
+      <path class="fl" d="M204 250Q300 170 398 285"/>`;
     for (let k = 0; k < 3; k++)
-      o += `<circle class="rp" style="animation-delay:-${k}s" cx="385" cy="290" r="18" fill="none" stroke="#dfe4ec" stroke-width="2"/>`;
+      o += `<circle class="rp" style="animation-delay:-${k}s" cx="411" cy="285" r="18" fill="none" stroke="#dfe4ec" stroke-width="2"/>`;
     o += `<rect x="610" y="60" width="70" height="250" rx="20" fill="#0d0e11" stroke="#8a93a3" stroke-width="3"/>`;
     for (let k = 0; k < 4; k++)
       o += `<rect class="pl" style="animation-delay:-${k * 0.5}s" x="624" y="${76 + k * 57}" width="42" height="46" rx="8" fill="#cfd5df"/>
       <rect x="638" y="${70 + k * 57}" width="14" height="6" rx="2" fill="#cfd5df"/>`;
-    o += `<path class="fl2" d="M608 190L392 190"/>
-      <path class="fl" d="M608 190L392 190"/>
+    o += `<path class="fl2" d="M608 190L420 190"/>
+      <path class="fl" d="M608 190L420 190"/>
       <rect x="600" y="338" width="90" height="30" rx="15" fill="#1b1f27" stroke="#9aa3b2" stroke-width="2"/>
       <rect x="612" y="347" width="66" height="12" rx="6" fill="#04122a"/>
       <path class="fl" d="M645 322V338"/>
